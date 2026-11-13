@@ -1,0 +1,1347 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Phoenix-A | منصة تصميم المهمة وتحليل الأنظمة الفضائية</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+.chart-container {
+  position: relative;
+  width: 100%;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  height: 280px;
+  max-height: 360px;
+}
+@media (min-width: 768px) {
+  .chart-container {
+    height: 320px;
+  }
+}
+.orbit-canvas {
+  width: 100%;
+  height: 300px;
+  max-height: 350px;
+  background: radial-gradient(circle at 50% 50%, #f0f4f8, #e2e8f0 80%);
+  border-radius: 0.75rem;
+  border: 1px solid #cbd5e1;
+  display: block;
+}
+</style>
+</head>
+<body class="bg-stone-50 text-slate-800 font-sans antialiased selection:bg-teal-100 selection:text-teal-900">
+
+<header class="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-stone-200 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex flex-wrap items-center justify-between gap-4">
+    <div class="flex items-center gap-3">
+      <div class="w-12 h-12 rounded-xl bg-teal-700 text-white font-black text-xl flex items-center justify-center shadow-sm tracking-tighter">
+        P-A
+      </div>
+      <div>
+        <h1 class="text-xl sm:text-2xl font-bold text-slate-900 tracking-tight">PHOENIX-A</h1>
+        <p class="text-xs sm:text-sm text-slate-500" data-i18n="subtitle">منصة تصميم المهمة وتحليل الأنظمة الفضائية المتقدمة</p>
+      </div>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      <button id="langBtn" class="px-3.5 py-2 rounded-lg border border-stone-300 bg-stone-100 hover:bg-stone-200 text-slate-700 text-sm font-semibold transition">English</button>
+      <button id="exportBtn" class="px-3.5 py-2 rounded-lg border border-stone-300 bg-white hover:bg-stone-100 text-slate-700 text-sm font-semibold transition" data-i18n="exportJson">تصدير الملف (JSON)</button>
+      <button id="printBtn" class="px-3.5 py-2 rounded-lg border border-stone-300 bg-white hover:bg-stone-100 text-slate-700 text-sm font-semibold transition" data-i18n="printReport">طباعة التقرير</button>
+      <button id="resetBtn" class="px-4 py-2 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-sm font-semibold shadow-sm transition" data-i18n="reset">إعادة الضبط</button>
+    </div>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 space-y-6">
+
+  <!-- Executive Overview & Live Snapshot -->
+  <section class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+    <div class="lg:col-span-7 bg-white rounded-2xl border border-stone-200 p-6 shadow-sm flex flex-col justify-between">
+      <div>
+        <span class="inline-block text-xs font-bold uppercase tracking-wider text-teal-700 bg-teal-50 px-2.5 py-1 rounded-md mb-2">MISSION ENGINEERING / ULTIMATE EDITION</span>
+        <h2 class="text-xl sm:text-2xl font-bold text-slate-900 mb-2" data-i18n="heroTitle">من الفكرة إلى قرار هندسي فضائي موثوق ومحسوب</h2>
+        <p class="text-sm sm:text-base text-slate-600 leading-relaxed" data-i18n="heroText">تدمج منصة Phoenix-A نماذج ديناميكا المدارات، والدفع الصاروخي، والطاقة الشمسية والحرارية، واتصالات الفضاء السحيق، وهيكل الكتلة في بيئة تفاعلية واحدة لتقييم جدوى المهمات الفضائية بدقة.</p>
+      </div>
+      <div class="mt-4 p-3.5 rounded-xl bg-stone-100 border-r-4 border-teal-600 text-xs sm:text-sm text-slate-700" data-i18n="scopeNote">
+        حدود النموذج: تقديرات أولية مثالية وليست تصميم مسار تنفيذي. لا تشمل نتائج الكواكب بالكامل مغادرة مدار الانتظار الأرضي أو الالتقاط عند الوصول، كما أن Δv الوصول القمري قيمة افتراضية ثابتة.
+      </div>
+    </div>
+
+    <div class="lg:col-span-5 bg-white rounded-2xl border border-stone-200 p-6 shadow-sm">
+      <div class="flex items-center justify-between mb-4">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-400">LIVE TELEMETRY</span>
+          <h2 class="text-lg font-bold text-slate-900" data-i18n="snapshot">ملخص المهمة الفضائية</h2>
+        </div>
+        <span class="text-xl">🛰️</span>
+      </div>
+      <div class="grid grid-cols-2 gap-3">
+        <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200">
+          <div class="text-xs text-slate-500 mb-1" data-i18n="destination">الوجهة المختارة</div>
+          <div id="snapTarget" class="text-lg font-extrabold text-teal-700" dir="ltr">MARS</div>
+        </div>
+        <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200">
+          <div class="text-xs text-slate-500 mb-1" data-i18n="transferTime">زمن الانتقال المثالي</div>
+          <div id="snapTime" class="text-lg font-extrabold text-slate-800" dir="ltr">—</div>
+        </div>
+        <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200">
+          <div class="text-xs text-slate-500 mb-1">Δv Total</div>
+          <div id="snapDv" class="text-lg font-extrabold text-slate-800" dir="ltr">—</div>
+        </div>
+        <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200">
+          <div class="text-xs text-slate-500 mb-1" data-i18n="systemStatus">حالة التدقيق الهندسي</div>
+          <div id="snapStatus" class="text-sm font-bold mt-1">—</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Navigation Tabs -->
+  <nav class="flex gap-2 overflow-x-auto pb-2 border-b border-stone-200" aria-label="Subsystems Navigation">
+    <button class="tab-btn active px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap bg-teal-700 text-white shadow-sm transition" data-tab="mission" data-i18n="tabMission">1. المهمة والمدار</button>
+    <button class="tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap bg-white text-slate-600 hover:bg-stone-100 border border-stone-200 transition" data-tab="propulsion" data-i18n="tabProp">2. الدفع والكتلة</button>
+    <button class="tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap bg-white text-slate-600 hover:bg-stone-100 border border-stone-200 transition" data-tab="power" data-i18n="tabPower">3. الطاقة والحرارة</button>
+    <button class="tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap bg-white text-slate-600 hover:bg-stone-100 border border-stone-200 transition" data-tab="comms" data-i18n="tabComms">4. اتصالات الفضاء السحيق</button>
+    <button class="tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap bg-white text-slate-600 hover:bg-stone-100 border border-stone-200 transition" data-tab="massbudget" data-i18n="tabMass">5. هيكل الكتلة الشامل</button>
+    <button class="tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap bg-white text-slate-600 hover:bg-stone-100 border border-stone-200 transition" data-tab="validation" data-i18n="tabValidation">6. التحقق العلمي</button>
+  </nav>
+
+  <!-- TAB 1: MISSION & ORBIT -->
+  <section id="mission" class="tab-panel space-y-6">
+    <div class="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+      <h2 class="text-lg font-bold text-slate-900 mb-1" data-i18n="sec1Title">تحليل المسار المداري وميكانيكا الانتقال</h2>
+      <p class="text-sm text-slate-600" data-i18n="sec1Intro">يقدّر هذا القسم زمن الانتقال وفروق السرعة في نموذج هوهمان الشمسي المثالي للكواكب، أو نموذج TLI المبسط للقمر. قيم الكواكب لا تمثل وحدها Δv الفعلي للمغادرة من مدار أرضي والالتقاط عند الوصول.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-5 bg-white rounded-2xl border border-stone-200 p-6 shadow-sm">
+        <span class="text-xs font-bold uppercase tracking-wider text-teal-700">TRAJECTORY INPUTS</span>
+        <h3 class="text-base font-bold text-slate-900 mt-1 mb-4" data-i18n="missionInputs">إعدادات المسار والانتقال</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="target">الوجهة الفضائية</label>
+            <select id="target" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+              <option value="mars">Mars / المريخ (Hohmann)</option>
+              <option value="moon">Moon / القمر (TLI Geocentric)</option>
+              <option value="venus">Venus / الزهرة (Hohmann)</option>
+              <option value="mercury">Mercury / عطارد (Hohmann)</option>
+              <option value="jupiter">Jupiter / المشتري (Hohmann)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="orbitAlt">ارتفاع مدار الانتظار (km)</label>
+            <input id="orbitAlt" type="number" min="100" max="2000" value="400" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="payload">كتلة الحمولة العلمية (kg)</label>
+            <input id="payload" type="number" min="1" max="50000" value="500" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="arrival">هامش مناورة إضافي (km/s)</label>
+            <input id="arrival" type="number" min="0" max="20" step="0.1" value="0.2" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+        </div>
+        <button id="calcMission" class="mt-5 w-full py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-bold shadow-sm transition" data-i18n="calculate">حساب المسار الديناميكي</button>
+        <div class="mt-4 p-3 rounded-xl bg-stone-50 border border-stone-200 text-xs text-slate-600" data-i18n="orbitNote">
+          للكواكب: يُستخدم مدار انتقال هوهمان الإهليلجي حول الشمس. للقمر: يُستخدم الانتقال القمري المباشر (TLI) من مدار الأرض.
+        </div>
+      </div>
+
+      <div class="lg:col-span-7 bg-white rounded-2xl border border-stone-200 p-6 shadow-sm flex flex-col justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-teal-700">ORBITAL OUTPUTS</span>
+          <h3 class="text-base font-bold text-slate-900 mt-1 mb-4" data-i18n="orbitResults">نتائج تحليل المدار والزمن</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5">
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="transferDays" class="text-lg font-extrabold text-teal-700" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="flightDays">مدة الانتقال (يوم)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="dvDeparture" class="text-lg font-extrabold text-slate-800" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="departureDv">Δv المغادرة (km/s)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="dvArrival" class="text-lg font-extrabold text-slate-800" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="arrivalDv">Δv الوصول (km/s)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="dvTotal" class="text-lg font-extrabold text-teal-700" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="totalIdealDv">مجموع Δv (km/s)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="phaseAngle" class="text-lg font-extrabold text-slate-800" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="phase">زاوية الطور (°)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="earthEscape" class="text-lg font-extrabold text-slate-800" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="earthEscape">سرعة الإفلات (km/s)</div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <canvas id="orbitCanvas" width="800" height="300" class="orbit-canvas"></canvas>
+          <p class="text-xs text-slate-400 mt-2 text-center" data-i18n="notScale">رسم تخطيطي تفاعلي يوضح هندسة الانتقال المداري ومواقع الأجرام.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 2: PROPULSION -->
+  <section id="propulsion" class="tab-panel hidden space-y-6">
+    <div class="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+      <h2 class="text-lg font-bold text-slate-900 mb-1" data-i18n="sec2Title">هندسة الدفع الصاروخي ومعادلة تسيولكوفسكي</h2>
+      <p class="text-sm text-slate-600" data-i18n="sec2Intro">تحسب هذه الوحدة التغير الكلي في السرعة (Δv) المتاح بناءً على كتلة الوقود والاندفاع النوعي للمحرك (Isp)، وتقارن الوقود المطلوب بالوقود المتوفر فعلياً.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-5 bg-white rounded-2xl border border-stone-200 p-6 shadow-sm">
+        <span class="text-xs font-bold uppercase tracking-wider text-teal-700">PROPULSION PARAMETERS</span>
+        <h3 class="text-base font-bold text-slate-900 mt-1 mb-4" data-i18n="propInputs">مدخلات نظام الدفع وتسيولكوفسكي</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="dryMass">الكتلة الجافة للمركبة (kg)</label>
+            <input id="dryMass" type="number" min="1" value="1200" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="propMass">كتلة الوقود المتاحة (kg)</label>
+            <input id="propMass" type="number" min="0" value="1800" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1">Specific Impulse Isp (s)</label>
+            <input id="isp" type="number" min="1" max="5000" value="320" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="requiredDv">Δv المطلوب للمناورة (m/s)</label>
+            <input id="requiredDv" type="number" min="0" value="2500" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="thrust">قوة دفع المحرك Thrust (N)</label>
+            <input id="thrust" type="number" min="0.001" value="22000" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+        </div>
+        <button id="calcProp" class="mt-5 w-full py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-bold shadow-sm transition" data-i18n="calculate">حساب معادلة الصواريخ</button>
+        <div class="mt-4 p-3 rounded-xl bg-stone-900 text-teal-300 font-mono text-xs text-center" dir="ltr">
+          Δv = Isp · g₀ · ln(m₀ / mf)
+        </div>
+      </div>
+
+      <div class="lg:col-span-7 bg-white rounded-2xl border border-stone-200 p-6 shadow-sm flex flex-col justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-teal-700">PROPULSION PERFORMANCE</span>
+          <h3 class="text-base font-bold text-slate-900 mt-1 mb-4" data-i18n="propResults">نتائج نظام الدفع والكتلة</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5">
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="availableDv" class="text-lg font-extrabold text-teal-700" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5">Available Δv (km/s)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="requiredProp" class="text-lg font-extrabold text-slate-800" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="propRequired">الوقود المطلوب (kg)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="massRatio" class="text-lg font-extrabold text-slate-800" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5">Mass Ratio (m₀/mf)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="burnTime" class="text-lg font-extrabold text-slate-800" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="burnTime">زمن الاحتراق (s)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="finalMass" class="text-lg font-extrabold text-slate-800" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="finalMass">الكتلة المتبقية (kg)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="propStatus" class="text-sm font-bold mt-1">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="feasibility">كفاية الوقود</div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="propChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 3: POWER & THERMAL -->
+  <section id="power" class="tab-panel hidden space-y-6">
+    <div class="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+      <h2 class="text-lg font-bold text-slate-900 mb-1" data-i18n="sec3Title">توليد الطاقة الشمسية والاتزان الحراري</h2>
+      <p class="text-sm text-slate-600" data-i18n="sec3Intro">يقيّم هذا القسم قدرة الألواح الشمسية على تلبية الأحمال الكهربائية للمركبة عند مسافات مختلفة عن الشمس، ويحسب درجة حرارة الاتزان الإشعاعي للهيكل الخارجي.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-5 bg-white rounded-2xl border border-stone-200 p-6 shadow-sm">
+        <span class="text-xs font-bold uppercase tracking-wider text-teal-700">SOLAR & THERMAL INPUTS</span>
+        <h3 class="text-base font-bold text-slate-900 mt-1 mb-4" data-i18n="powerInputs">مدخلات الطاقة الشمسية والحرارة</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="solarDistance">البعد عن الشمس (AU)</label>
+            <select id="solarDistance" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+              <option value="0.387">Mercury / عطارد (0.387 AU)</option>
+              <option value="0.723">Venus / الزهرة (0.723 AU)</option>
+              <option value="1.0">Earth & Moon / الأرض والقمر (1.000 AU)</option>
+              <option value="1.524" selected>Mars / المريخ (1.524 AU)</option>
+              <option value="5.204">Jupiter / المشتري (5.204 AU)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="panelArea">مساحة الألواح الشمسية (m²)</label>
+            <input id="panelArea" type="number" min="0.1" step="0.5" value="12" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="efficiency">كفاءة الخلايا (%)</label>
+            <input id="efficiency" type="number" min="1" max="60" value="30" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="degradation">عامل الأداء والنظافة (%)</label>
+            <input id="degradation" type="number" min="1" max="100" value="85" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="load">الحمل الكهربائي المستمر (W)</label>
+            <input id="load" type="number" min="0" value="1200" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="emissivity">انبعاثية السطح (ε)</label>
+            <input id="emissivity" type="number" min="0.01" max="1" step="0.01" value="0.85" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+        </div>
+        <button id="calcPower" class="mt-5 w-full py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-bold shadow-sm transition" data-i18n="calculate">حساب التوازن الحراري والطاقة</button>
+        <div class="mt-4 p-3 rounded-xl bg-stone-900 text-teal-300 font-mono text-xs text-center" dir="ltr">
+          P = (S₀ / r²) · A · η · f
+        </div>
+      </div>
+
+      <div class="lg:col-span-7 bg-white rounded-2xl border border-stone-200 p-6 shadow-sm flex flex-col justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-teal-700">ENERGY & THERMAL BALANCE</span>
+          <h3 class="text-base font-bold text-slate-900 mt-1 mb-4" data-i18n="powerResults">نتائج توليد الطاقة والاتزان الحراري</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-5">
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="solarFlux" class="text-lg font-extrabold text-slate-800" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5">Solar Flux (W/m²)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="generatedPower" class="text-lg font-extrabold text-teal-700" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="generated">القدرة المنتجة (W)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="powerMargin" class="text-lg font-extrabold text-slate-800" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="margin">هامش القدرة (W)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="thermalTemp" class="text-lg font-extrabold text-slate-800" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="equilibrium">حرارة الاتزان (K)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="thermalC" class="text-lg font-extrabold text-slate-800" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="celsius">حرارة الاتزان (°C)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="powerStatus" class="text-sm font-bold mt-1">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="powerStatus">كفاية الطاقة</div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="powerChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 4: COMMUNICATIONS -->
+  <section id="comms" class="tab-panel hidden space-y-6">
+    <div class="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+      <h2 class="text-lg font-bold text-slate-900 mb-1" data-i18n="sec4Title">ميزانية اتصالات الفضاء السحيق (DSN Link Budget)</h2>
+      <p class="text-sm text-slate-600" data-i18n="sec4Intro">تحسب هذه الوحدة توهين الإشارة في الفضاء الحر (FSPL)، ونسبة الإشارة إلى الضوضاء (Eb/N₀)، وزمن وصول الإشارة الضوئية لضمان موثوقية الاتصال مع المحطات الأرضية.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-5 bg-white rounded-2xl border border-stone-200 p-6 shadow-sm">
+        <span class="text-xs font-bold uppercase tracking-wider text-teal-700">DSN LINK PARAMETERS</span>
+        <h3 class="text-base font-bold text-slate-900 mt-1 mb-4" data-i18n="commsInputs">مدخلات وصلة الاتصالات السحيقة</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="distance">المسافة عن الأرض (km)</label>
+            <input id="distance" type="number" min="1" value="225000000" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="frequency">التردد الراديوي (GHz)</label>
+            <input id="frequency" type="number" min="0.1" step="0.1" value="8.4" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="txPower">قدرة الإرسال (W)</label>
+            <input id="txPower" type="number" min="0.001" value="25" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="txGain">كسب هوائي المركبة (dBi)</label>
+            <input id="txGain" type="number" value="28" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="rxGain">كسب المحطة الأرضية (dBi)</label>
+            <input id="rxGain" type="number" value="65" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="losses">الخسائر الإضافية (dB)</label>
+            <input id="losses" type="number" min="0" value="3" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="noiseTemp">حرارة الضوضاء (K)</label>
+            <input id="noiseTemp" type="number" min="1" value="75" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="dataRate">معدل البيانات (kbps)</label>
+            <input id="dataRate" type="number" min="0.001" value="100" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div class="sm:col-span-2">
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="requiredEb">Eb/N₀ المطلوب لفك التشفير (dB)</label>
+            <input id="requiredEb" type="number" min="0" step="0.5" value="3.5" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+        </div>
+        <button id="calcComms" class="mt-5 w-full py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-bold shadow-sm transition" data-i18n="calculate">حساب ميزانية الوصلة</button>
+      </div>
+
+      <div class="lg:col-span-7 bg-white rounded-2xl border border-stone-200 p-6 shadow-sm flex flex-col justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-teal-700">LINK BUDGET TELEMETRY</span>
+          <h3 class="text-base font-bold text-slate-900 mt-1 mb-4" data-i18n="commsResults">نتائج ميزانية الاتصالات الفضائية</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-6">
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="lightTime" class="text-lg font-extrabold text-teal-700" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="oneWay">زمن وصول الإشارة (min)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="fspl" class="text-lg font-extrabold text-slate-800" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5">FSPL (dB)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="eirp" class="text-lg font-extrabold text-slate-800" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5">EIRP (dBW)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="cn0" class="text-lg font-extrabold text-slate-800" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5">C/N₀ (dB-Hz)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="ebn0" class="text-lg font-extrabold text-teal-700" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5">Eb/N₀ (dB)</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="linkMargin" class="text-lg font-extrabold" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="linkMargin">هامش الاتصال (dB)</div>
+            </div>
+          </div>
+
+          <div class="p-4 rounded-xl bg-stone-50 border border-stone-200">
+            <div class="flex justify-between text-xs font-bold text-slate-700 mb-2">
+              <span data-i18n="signalQuality">مؤشر جودة واستقرار الوصلة اللاسلكية</span>
+              <span id="marginBadgeText">—</span>
+            </div>
+            <div class="w-full h-3.5 bg-stone-200 rounded-full overflow-hidden">
+              <div id="marginBar" class="h-full bg-teal-600 transition-all duration-300" style="width: 50%"></div>
+            </div>
+            <div class="flex justify-between text-[11px] text-slate-400 mt-1.5" dir="ltr">
+              <span>-10 dB (Lost)</span>
+              <span>0 dB (Threshold)</span>
+              <span>+3 dB (Nominal)</span>
+              <span>+15 dB (Strong)</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="mt-4 p-3 rounded-xl bg-stone-900 text-teal-300 font-mono text-xs text-center" dir="ltr">
+          FSPL = 20 log₁₀(4πdf / c) &nbsp;|&nbsp; Margin = (Eb/N₀) - (Eb/N₀)_req
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 5: MASS BUDGET -->
+  <section id="massbudget" class="tab-panel hidden space-y-6">
+    <div class="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+      <h2 class="text-lg font-bold text-slate-900 mb-1" data-i18n="sec5Title">هيكل الكتلة الشامل للمركبة الفضائية (Mass Budget)</h2>
+      <p class="text-sm text-slate-600" data-i18n="sec5Intro">يوزع هذا القسم الكتلة الجافة على الأنظمة الفرعية ويربطها تلقائياً بكتلة الوقود المحسوبة في تبويب الدفع لتحديد الكتلة الكلية عند الإطلاق ونسبة الحمولة العلمية.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-5 bg-white rounded-2xl border border-stone-200 p-6 shadow-sm">
+        <span class="text-xs font-bold uppercase tracking-wider text-teal-700">SUBSYSTEM MASSES</span>
+        <h3 class="text-base font-bold text-slate-900 mt-1 mb-4" data-i18n="massInputs">توزيع كتل الأنظمة الفرعية (kg)</h3>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="mPayload">الحمولة العلمية (Payload)</label>
+            <input id="mPayload" type="number" min="0" value="500" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="mStructure">الهيكل والحرارة</label>
+            <input id="mStructure" type="number" min="0" value="350" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="mPower">نظام الطاقة</label>
+            <input id="mPower" type="number" min="0" value="200" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="mAvionics">التوجيه والحاسب (GNC)</label>
+            <input id="mAvionics" type="number" min="0" value="100" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="mPropulsionSys">نظام الدفع الجاف</label>
+            <input id="mPropSys" type="number" min="0" value="150" class="w-full rounded-xl border border-stone-300 bg-stone-50 px-3 py-2 text-sm focus:border-teal-600 focus:outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-slate-700 mb-1" data-i18n="mPropellant">كتلة الوقود (مرتبطة تلقائياً)</label>
+            <input id="mPropLinked" type="number" readonly value="1800" class="w-full rounded-xl border border-stone-200 bg-stone-200/70 text-slate-600 px-3 py-2 text-sm font-bold cursor-not-allowed">
+          </div>
+        </div>
+        <button id="calcMass" class="mt-5 w-full py-2.5 rounded-xl bg-teal-700 hover:bg-teal-800 text-white text-sm font-bold shadow-sm transition" data-i18n="calculateMass">تحديث هيكل الكتلة</button>
+      </div>
+
+      <div class="lg:col-span-7 bg-white rounded-2xl border border-stone-200 p-6 shadow-sm flex flex-col justify-between">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-teal-700">MASS DISTRIBUTION</span>
+          <h3 class="text-base font-bold text-slate-900 mt-1 mb-4" data-i18n="massResults">ملخص كتل المركبة الفضائية</h3>
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-5">
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="totalDryMass" class="text-base font-extrabold text-slate-800" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="totDry">الكتلة الجافة</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="totalWetMass" class="text-base font-extrabold text-teal-700" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="totWet">كتلة الإطلاق الكلية</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="payloadFraction" class="text-base font-extrabold text-slate-800" dir="ltr">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="payFrac">نسبة الحمولة</div>
+            </div>
+            <div class="p-3 rounded-xl bg-stone-50 border border-stone-200">
+              <div id="massStatus" class="text-sm font-bold mt-0.5">—</div>
+              <div class="text-xs text-slate-500 mt-0.5" data-i18n="massFeas">سعة الصاروخ</div>
+            </div>
+          </div>
+        </div>
+        <div class="chart-container">
+          <canvas id="massChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- TAB 6: SCIENTIFIC VALIDATION -->
+  <section id="validation" class="tab-panel hidden space-y-6">
+    <div class="bg-white rounded-2xl border border-stone-200 p-5 shadow-sm">
+      <h2 class="text-lg font-bold text-slate-900 mb-1" data-i18n="sec6Title">التحقق الفيزيائي واختبارات الاتساق الآلية</h2>
+      <p class="text-sm text-slate-600" data-i18n="sec6Intro">تجري المنصة حزمة اختبارات رياضية وفيزيائية مستمرة للتحقق من عدم وجود تناقضات بين الأنظمة الفرعية وصحة تطبيق القوانين الفيزيائية.</p>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+      <div class="lg:col-span-7 bg-white rounded-2xl border border-stone-200 p-6 shadow-sm">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-base font-bold text-slate-900" data-i18n="validationTitle">نتائج فحص الاتساق الهندسي</h3>
+          <button id="runTests" class="px-3.5 py-1.5 rounded-lg bg-teal-700 hover:bg-teal-800 text-white text-xs font-bold transition" data-i18n="rerun">إعادة الفحص</button>
+        </div>
+        <div id="testResults" class="space-y-3"></div>
+      </div>
+
+      <div class="lg:col-span-5 bg-white rounded-2xl border border-stone-200 p-6 shadow-sm">
+        <span class="text-xs font-bold uppercase tracking-wider text-teal-700">ENGINEERING STANDARDS</span>
+        <h3 class="text-base font-bold text-slate-900 mt-1 mb-3" data-i18n="assumptions">المرجعيات العلمية والافتراضات</h3>
+        <ul class="space-y-2.5 text-sm text-slate-600 list-disc list-inside">
+          <li data-i18n="assumption1">تعتمد جميع المعادلات الداخلية النظام الدولي للوحدات (SI Units) بدقة عالية.</li>
+          <li data-i18n="assumption2">يفترض انتقال هوهمان مدارات كوكبية دائرية متحدة المستوى للتقدير الأولي.</li>
+          <li data-i18n="assumption3">تُحسب معادلة تسيولكوفسكي المثالية بفرض ثبات الاندفاع النوعي (Isp) خلال الاحتراق.</li>
+          <li data-i18n="assumption4">تُقيّم درجة حرارة الاتزان الحراري بافتراض جسم كروي متجانس الإشعاع.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer class="border-t border-stone-200 bg-white mt-12 py-6">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-wrap justify-between items-center gap-4 text-xs text-slate-500">
+    <div>PHOENIX-A • Ultimate Space Mission Engineering Simulator</div>
+    <div>Interactive application • Tailwind CSS and Chart.js load from CDN</div>
+  </div>
+</footer>
+
+<script>
+"use strict";
+const $ = id => document.getElementById(id);
+const G0 = 9.80665, AU = 149597870700, MU_SUN = 1.32712440018e20, MU_EARTH = 3.986004418e14;
+const S0 = 1361, SIGMA = 5.670374419e-8, C = 299792458, K_DB = -228.6;
+
+const PLANETS = {
+  earth: { a: 1.0, r: 6371e3 },
+  mars: { a: 1.523679, r: 3389.5e3 },
+  venus: { a: 0.723332, r: 6051.8e3 },
+  mercury: { a: 0.387098, r: 2439.7e3 },
+  jupiter: { a: 5.2044, r: 69911e3 },
+  moon: { a: 384400e3, r: 1737.4e3 }
+};
+
+let charts = { prop: null, power: null, mass: null };
+let lang = "ar";
+
+const translations = {
+  ar: {
+    subtitle: "منصة تصميم المهمة وتحليل الأنظمة الفضائية المتقدمة",
+    reset: "إعادة الضبط",
+    exportJson: "تصدير الملف (JSON)",
+    printReport: "طباعة التقرير",
+    heroTitle: "من الفكرة إلى قرار هندسي فضائي موثوق ومحسوب",
+    heroText: "تدمج منصة Phoenix-A نماذج ديناميكا المدارات، والدفع الصاروخي، والطاقة الشمسية والحرارية، واتصالات الفضاء السحيق، وهيكل الكتلة في بيئة تفاعلية واحدة لتقييم جدوى المهمات الفضائية بدقة.",
+    scopeNote: "حدود النموذج: تقديرات أولية مثالية وليست تصميم مسار تنفيذي. لا تشمل نتائج الكواكب بالكامل مغادرة مدار الانتظار الأرضي أو الالتقاط عند الوصول، كما أن Δv الوصول القمري قيمة افتراضية ثابتة.",
+    snapshot: "ملخص المهمة الفضائية",
+    destination: "الوجهة المختارة",
+    transferTime: "زمن الانتقال المثالي",
+    systemStatus: "حالة التدقيق الهندسي",
+    tabMission: "1. المهمة والمدار",
+    tabProp: "2. الدفع والكتلة",
+    tabPower: "3. الطاقة والحرارة",
+    tabComms: "4. اتصالات الفضاء السحيق",
+    tabMass: "5. هيكل الكتلة الشامل",
+    tabValidation: "6. التحقق العلمي",
+    sec1Title: "تحليل المسار المداري وميكانيكا الانتقال",
+    sec1Intro: "يقدّر هذا القسم زمن الانتقال وفروق السرعة في نموذج هوهمان الشمسي المثالي للكواكب، أو نموذج TLI المبسط للقمر. قيم الكواكب لا تمثل وحدها Δv الفعلي للمغادرة من مدار أرضي والالتقاط عند الوصول.",
+    missionInputs: "إعدادات المسار والانتقال",
+    target: "الوجهة الفضائية",
+    orbitAlt: "ارتفاع مدار الانتظار (km)",
+    payload: "كتلة الحمولة العلمية (kg)",
+    arrival: "هامش مناورة إضافي (km/s)",
+    calculate: "حساب وتحديث النتائج",
+    orbitNote: "للكواكب: يُستخدم مدار انتقال هوهمان الإهليلجي حول الشمس. للقمر: يُستخدم الانتقال القمري المباشر (TLI) من مدار الأرض.",
+    orbitResults: "نتائج تحليل المدار والزمن",
+    flightDays: "مدة الانتقال (يوم)",
+    departureDv: "Δv المغادرة (km/s)",
+    arrivalDv: "Δv الوصول (km/s)",
+    totalIdealDv: "مجموع فروق السرعة المثالية (km/s)",
+    phase: "زاوية الطور (°)",
+    earthEscape: "سرعة الإفلات (km/s)",
+    notScale: "رسم تخطيطي تفاعلي يوضح هندسة الانتقال المداري ومواقع الأجرام.",
+    sec2Title: "هندسة الدفع الصاروخي ومعادلة تسيولكوفسكي",
+    sec2Intro: "تحسب هذه الوحدة التغير الكلي في السرعة (Δv) المتاح بناءً على كتلة الوقود والاندفاع النوعي للمحرك (Isp)، وتقارن الوقود المطلوب بالوقود المتوفر فعلياً.",
+    propInputs: "مدخلات نظام الدفع وتسيولكوفسكي",
+    dryMass: "الكتلة الجافة للمركبة (kg)",
+    propMass: "كتلة الوقود المتاحة (kg)",
+    requiredDv: "Δv المطلوب للمناورة (m/s)",
+    thrust: "قوة دفع المحرك Thrust (N)",
+    propResults: "نتائج نظام الدفع والكتلة",
+    propRequired: "الوقود المطلوب (kg)",
+    burnTime: "زمن الاحتراق (s)",
+    finalMass: "الكتلة المتبقية (kg)",
+    feasibility: "كفاية الوقود",
+    sec3Title: "توليد الطاقة الشمسية والاتزان الحراري",
+    sec3Intro: "يقيّم هذا القسم قدرة الألواح الشمسية على تلبية الأحمال الكهربائية للمركبة عند مسافات مختلفة عن الشمس، ويحسب درجة حرارة الاتزان الإشعاعي للهيكل الخارجي.",
+    powerInputs: "مدخلات الطاقة الشمسية والحرارة",
+    solarDistance: "البعد عن الشمس (AU)",
+    panelArea: "مساحة الألواح الشمسية (m²)",
+    efficiency: "كفاءة الخلايا (%)",
+    degradation: "عامل الأداء والنظافة (%)",
+    load: "الحمل الكهربائي المستمر (W)",
+    emissivity: "انبعاثية السطح (ε)",
+    powerResults: "نتائج توليد الطاقة والاتزان الحراري",
+    generated: "القدرة المنتجة (W)",
+    margin: "هامش القدرة (W)",
+    equilibrium: "حرارة الاتزان (K)",
+    celsius: "حرارة الاتزان (°C)",
+    powerStatus: "كفاية الطاقة",
+    sec4Title: "ميزانية اتصالات الفضاء السحيق (DSN Link Budget)",
+    sec4Intro: "تحسب هذه الوحدة توهين الإشارة في الفضاء الحر (FSPL)، ونسبة الإشارة إلى الضوضاء (Eb/N₀)، وزمن وصول الإشارة الضوئية لضمان موثوقية الاتصال مع المحطات الأرضية.",
+    commsInputs: "مدخلات وصلة الاتصالات السحيقة",
+    distance: "المسافة عن الأرض (km)",
+    frequency: "التردد الراديوي (GHz)",
+    txPower: "قدرة الإرسال (W)",
+    txGain: "كسب هوائي المركبة (dBi)",
+    rxGain: "كسب المحطة الأرضية (dBi)",
+    losses: "الخسائر الإضافية (dB)",
+    noiseTemp: "حرارة الضوضاء (K)",
+    dataRate: "معدل البيانات (kbps)",
+    requiredEb: "Eb/N₀ المطلوب لفك التشفير (dB)",
+    commsResults: "نتائج ميزانية الاتصالات الفضائية",
+    oneWay: "زمن وصول الإشارة (min)",
+    linkMargin: "هامش الاتصال (dB)",
+    signalQuality: "مؤشر جودة واستقرار الوصلة اللاسلكية",
+    sec5Title: "هيكل الكتلة الشامل للمركبة الفضائية (Mass Budget)",
+    sec5Intro: "يوزع هذا القسم الكتلة الجافة على الأنظمة الفرعية ويربطها تلقائياً بكتلة الوقود المحسوبة في تبويب الدفع لتحديد الكتلة الكلية عند الإطلاق ونسبة الحمولة العلمية.",
+    massInputs: "توزيع كتل الأنظمة الفرعية (kg)",
+    mPayload: "الحمولة العلمية (Payload)",
+    mStructure: "الهيكل والحرارة",
+    mPower: "نظام الطاقة",
+    mAvionics: "التوجيه والحاسب (GNC)",
+    mPropulsionSys: "نظام الدفع الجاف",
+    mPropellant: "كتلة الوقود (مرتبطة تلقائياً)",
+    calculateMass: "تحديث هيكل الكتلة",
+    massResults: "ملخص كتل المركبة الفضائية",
+    totDry: "الكتلة الجافة",
+    totWet: "كتلة الإطلاق الكلية",
+    payFrac: "نسبة الحمولة",
+    massFeas: "سعة الصاروخ",
+    sec6Title: "التحقق الفيزيائي واختبارات الاتساق الآلية",
+    sec6Intro: "تجري المنصة حزمة اختبارات رياضية وفيزيائية مستمرة للتحقق من عدم وجود تناقضات بين الأنظمة الفرعية وصحة تطبيق القوانين الفيزيائية.",
+    validationTitle: "نتائج فحص الاتساق الهندسي",
+    rerun: "إعادة الفحص",
+    assumptions: "المرجعيات العلمية والافتراضات",
+    assumption1: "تعتمد جميع المعادلات الداخلية النظام الدولي للوحدات (SI Units) بدقة عالية.",
+    assumption2: "يفترض انتقال هوهمان مدارات كوكبية دائرية متحدة المستوى للتقدير الأولي.",
+    assumption3: "تُحسب معادلة تسيولكوفسكي المثالية بفرض ثبات الاندفاع النوعي (Isp) خلال الاحتراق.",
+    assumption4: "تُقيّم درجة حرارة الاتزان الحراري بافتراض جسم كروي متجانس الإشعاع."
+  },
+  en: {
+    subtitle: "Advanced Space Mission Design & Systems Simulator",
+    reset: "Reset",
+    exportJson: "Export JSON",
+    printReport: "Print Report",
+    heroTitle: "From concept to a reliable, calculated space engineering decision",
+    heroText: "Phoenix-A integrates orbital mechanics, Tsiolkovsky rocket dynamics, solar and thermal models, DSN deep space communications, and system mass budgets into a unified interactive environment.",
+    scopeNote: "Model limits: ideal preliminary estimates, not an executable trajectory design. Planetary results do not fully include Earth-orbit departure or arrival capture; lunar arrival Δv is a fixed assumed value.",
+    snapshot: "Live Mission Snapshot",
+    destination: "Selected Target",
+    transferTime: "Ideal Transfer Time",
+    systemStatus: "Engineering Checks",
+    tabMission: "1. Mission & Orbit",
+    tabProp: "2. Propulsion & Mass",
+    tabPower: "3. Power & Thermal",
+    tabComms: "4. Deep Space Comms",
+    tabMass: "5. System Mass Budget",
+    tabValidation: "6. Scientific Checks",
+    sec1Title: "Orbital Trajectory & Transfer Mechanics",
+    sec1Intro: "Estimates transfer time and velocity changes using an ideal heliocentric Hohmann model for planets or a simplified lunar TLI model. Planetary values are not the complete spacecraft Δv from Earth parking orbit through arrival capture.",
+    missionInputs: "Trajectory & Transfer Settings",
+    target: "Space Destination",
+    orbitAlt: "Parking Orbit Altitude (km)",
+    payload: "Science Payload Mass (kg)",
+    arrival: "Additional Maneuver Margin (km/s)",
+    calculate: "Calculate & Update",
+    orbitNote: "Planets: Heliocentric Hohmann elliptical transfer. Moon: Geocentric Trans-Lunar Injection (TLI).",
+    orbitResults: "Orbit & Duration Analysis",
+    flightDays: "Transfer Duration (days)",
+    departureDv: "Departure Δv (km/s)",
+    arrivalDv: "Arrival Δv (km/s)",
+    totalIdealDv: "Ideal velocity-change sum (km/s)",
+    phase: "Phase Angle (°)",
+    earthEscape: "Escape Speed (km/s)",
+    notScale: "Interactive schematic illustrating orbital transfer geometry and body positions.",
+    sec2Title: "Rocket Propulsion & Tsiolkovsky Dynamics",
+    sec2Intro: "Computes total available Δv based on propellant mass and specific impulse (Isp), comparing required propellant against available onboard reserves.",
+    propInputs: "Propulsion & Tsiolkovsky Inputs",
+    dryMass: "Spacecraft Dry Mass (kg)",
+    propMass: "Available Propellant (kg)",
+    requiredDv: "Required Maneuver Δv (m/s)",
+    thrust: "Engine Thrust (N)",
+    propResults: "Propulsion & Mass Results",
+    propRequired: "Required Propellant (kg)",
+    burnTime: "Burn Duration (s)",
+    finalMass: "Remaining Mass (kg)",
+    feasibility: "Propellant Margin",
+    sec3Title: "Solar Power Generation & Thermal Equilibrium",
+    sec3Intro: "Evaluates solar array generation capability against continuous spacecraft loads at varying heliocentric distances, alongside radiative equilibrium temperature.",
+    powerInputs: "Solar & Thermal Inputs",
+    solarDistance: "Solar Distance (AU)",
+    panelArea: "Solar Array Area (m²)",
+    efficiency: "Cell Efficiency (%)",
+    degradation: "Performance Factor (%)",
+    load: "Continuous Load (W)",
+    emissivity: "Surface Emissivity (ε)",
+    powerResults: "Power & Thermal Balance Results",
+    generated: "Generated Power (W)",
+    margin: "Power Margin (W)",
+    equilibrium: "Equilibrium Temp (K)",
+    celsius: "Equilibrium Temp (°C)",
+    powerStatus: "Power Sufficiency",
+    sec4Title: "Deep Space Network (DSN) Link Budget",
+    sec4Intro: "Calculates Free Space Path Loss (FSPL), bit energy-to-noise ratio (Eb/N₀), and one-way light time to verify ground station communications.",
+    commsInputs: "Deep Space Link Inputs",
+    distance: "Distance from Earth (km)",
+    frequency: "Carrier Frequency (GHz)",
+    txPower: "Transmit Power (W)",
+    txGain: "Spacecraft Antenna Gain (dBi)",
+    rxGain: "Ground Station Gain (dBi)",
+    losses: "Additional Losses (dB)",
+    noiseTemp: "System Noise Temp (K)",
+    dataRate: "Data Rate (kbps)",
+    requiredEb: "Required Eb/N₀ (dB)",
+    commsResults: "Deep Space Comms Results",
+    oneWay: "One-Way Light Time (min)",
+    linkMargin: "Link Margin (dB)",
+    signalQuality: "Wireless Link Stability Indicator",
+    sec5Title: "Comprehensive Spacecraft Mass Budget",
+    sec5Intro: "Distributes dry mass across subsystems and automatically links propellant mass from the propulsion module to determine total wet launch mass and payload fraction.",
+    massInputs: "Subsystem Mass Breakdown (kg)",
+    mPayload: "Science Payload",
+    mStructure: "Structure & Thermal",
+    mPower: "Power Subsystem",
+    mAvionics: "GNC & Avionics",
+    mPropulsionSys: "Dry Propulsion",
+    mPropellant: "Propellant (Auto-Linked)",
+    calculateMass: "Update Mass Budget",
+    massResults: "Spacecraft Mass Summary",
+    totDry: "Total Dry Mass",
+    totWet: "Wet Launch Mass",
+    payFrac: "Payload Fraction",
+    massFeas: "Launcher Capacity",
+    sec6Title: "Automated Physics & Consistency Verification",
+    sec6Intro: "Continuously runs mathematical and physical consistency checks across all subsystems to ensure physical validity.",
+    validationTitle: "Engineering Consistency Checks",
+    rerun: "Rerun Checks",
+    assumptions: "Scientific References & Assumptions",
+    assumption1: "All internal calculations adhere strictly to SI units.",
+    assumption2: "Hohmann transfer assumes coplanar circular planetary orbits.",
+    assumption3: "Ideal Tsiolkovsky equation assumes constant specific impulse (Isp).",
+    assumption4: "Equilibrium temperature assumes a uniformly radiating spherical body."
+  }
+};
+
+function tr(key) { return translations[lang][key] || key; }
+
+function wrapLabel(str, maxLen = 16) {
+  if (str.length <= maxLen) return str;
+  const words = str.split(' ');
+  const lines = [];
+  let current = '';
+  for (const w of words) {
+    if ((current + ' ' + w).trim().length <= maxLen) {
+      current = (current + ' ' + w).trim();
+    } else {
+      if (current) lines.push(current);
+      current = w;
+    }
+  }
+  if (current) lines.push(current);
+  return lines;
+}
+
+function setLang(next) {
+  lang = next;
+  document.documentElement.lang = lang;
+  document.documentElement.dir = lang === "ar" ? "rtl" : "ltr";
+  document.querySelectorAll("[data-i18n]").forEach(el => el.textContent = tr(el.dataset.i18n));
+  $("langBtn").textContent = lang === "ar" ? "English" : "العربية";
+  runAll();
+}
+
+function num(id) {
+  const x = Number($(id).value);
+  if (!Number.isFinite(x)) throw new Error("Invalid input: " + id);
+  return x;
+}
+
+function positive(id, allowZero = false) {
+  const x = num(id);
+  if (allowZero ? x < 0 : x <= 0) throw new Error("Out of range: " + id);
+  return x;
+}
+
+function fmt(x, d = 2) {
+  if (!Number.isFinite(x)) return "—";
+  return x.toLocaleString("en-US", { maximumFractionDigits: d, minimumFractionDigits: d });
+}
+
+function setText(id, x) { $(id).textContent = x; }
+function setMetric(id, x, unit = "", d = 2) { setText(id, fmt(x, d) + (unit ? " " + unit : "")); }
+
+function setStatusBadge(id, ok) {
+  const el = $(id);
+  el.textContent = ok ? (lang === "ar" ? "✓ سليم / كافٍ" : "✓ PASS / OK") : (lang === "ar" ? "✕ تحذير / نقص" : "✕ WARN / DEFICIT");
+  el.className = "text-sm font-bold mt-1 inline-block px-2.5 py-0.5 rounded-md " + (ok ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800");
+}
+
+function calculateMission() {
+  const target = $("target").value;
+  const alt = positive("orbitAlt");
+  const payload = positive("payload");
+  const allowance = positive("arrival", true);
+  
+  const targetDistances = { earth: "1.0", moon: "1.0", mars: "1.524", venus: "0.723", mercury: "0.387", jupiter: "5.204" };
+  if (targetDistances[target]) {
+    $("solarDistance").value = targetDistances[target];
+  }
+
+  let result = {};
+
+  if (target !== "moon") {
+    const p = PLANETS[target];
+    const r1 = PLANETS.earth.a * AU, r2 = p.a * AU;
+    const a = (r1 + r2) / 2;
+    const v1 = Math.sqrt(MU_SUN / r1), v2 = Math.sqrt(MU_SUN / r2);
+    const vt1 = Math.sqrt(MU_SUN * (2 / r1 - 1 / a)), vt2 = Math.sqrt(MU_SUN * (2 / r2 - 1 / a));
+    const tof = Math.PI * Math.sqrt(a ** 3 / MU_SUN);
+    const n2 = Math.sqrt(MU_SUN / r2 ** 3);
+    const phase = (Math.PI - n2 * tof) * 180 / Math.PI;
+    result = {
+      days: tof / 86400,
+      dv1: Math.abs(vt1 - v1) / 1000,
+      dv2: Math.abs(v2 - vt2) / 1000,
+      total: (Math.abs(vt1 - v1) + Math.abs(v2 - vt2)) / 1000,
+      phase: ((phase % 360) + 360) % 360
+    };
+  } else {
+    const rp = PLANETS.earth.r + alt * 1000;
+    const rm = PLANETS.moon.a;
+    const a = (rp + rm) / 2;
+    const vp = Math.sqrt(MU_EARTH / rp);
+    const vt_perigee = Math.sqrt(MU_EARTH * (2 / rp - 1 / a));
+    const tli_dv = (vt_perigee - vp) / 1000;
+    const tof = Math.PI * Math.sqrt(a ** 3 / MU_EARTH);
+    result = {
+      days: tof / 86400,
+      dv1: tli_dv,
+      dv2: 0.85,
+      total: tli_dv + 0.85,
+      phase: 0
+    };
+  }
+
+  $("mPayload").value = payload;
+  const dvTotal = result.total + allowance;
+  setText("snapTarget", target.toUpperCase());
+  setMetric("transferDays", result.days, "", 1);
+  setText("dvDeparture", fmt(result.dv1, 3));
+  setText("dvArrival", fmt(result.dv2, 3));
+  setText("dvTotal", fmt(dvTotal, 3));
+  setText("phaseAngle", target === "moon" ? "N/A" : fmt(result.phase, 1));
+
+  const rParking = PLANETS.earth.r + alt * 1000;
+  const esc = Math.sqrt(2 * MU_EARTH / rParking) / 1000;
+  setMetric("earthEscape", esc, "km/s", 3);
+
+  setText("snapTime", fmt(result.days, 1) + " d");
+  setText("snapDv", fmt(dvTotal, 3) + " km/s");
+  drawOrbit();
+  return result;
+}
+
+function calculateProp() {
+  const dry = positive("dryMass");
+  const prop = positive("propMass", true);
+  const isp = positive("isp");
+  const dv = positive("requiredDv", true);
+  const thrust = positive("thrust");
+
+  const m0 = dry + prop;
+  const availableDv = isp * G0 * Math.log(m0 / dry);
+  const neededProp = dry * Math.expm1(dv / (isp * G0));
+  const finalMass = m0 - neededProp;
+  const mdot = thrust / (isp * G0);
+  const requiredBurn = neededProp / mdot;
+
+  setMetric("availableDv", availableDv / 1000, "km/s", 3);
+  setMetric("requiredProp", neededProp, "kg", 1);
+  setMetric("massRatio", m0 / dry, "", 3);
+  setMetric("burnTime", requiredBurn, "s", 1);
+  setMetric("finalMass", finalMass, "kg", 1);
+  setStatusBadge("propStatus", neededProp <= prop + 1e-6);
+
+  $("mPropLinked").value = prop.toFixed(1);
+  updatePropChart(dry, prop, neededProp);
+  return { availableDv, neededProp, finalMass, requiredBurn };
+}
+
+function updatePropChart(dry, availProp, reqProp) {
+  const ctx = $("propChart").getContext("2d");
+  const labels = [
+    wrapLabel(lang === "ar" ? "الكتلة الجافة للمركبة" : "Dry Spacecraft Mass"),
+    wrapLabel(lang === "ar" ? "الوقود المتاح حالياً" : "Available Propellant"),
+    wrapLabel(lang === "ar" ? "الوقود المطلوب للمناورة" : "Required Propellant")
+  ];
+  const data = [dry, availProp, reqProp];
+  const colors = ["#64748b", "#0f766e", reqProp <= availProp ? "#10b981" : "#e11d48"];
+
+  if (charts.prop) charts.prop.destroy();
+  charts.prop = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        label: lang === "ar" ? "الكتلة (kg)" : "Mass (kg)",
+        data,
+        backgroundColor: colors,
+        borderRadius: 6
+      }]
+    },
+    options: {
+      indexAxis: "y",
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: c => `${fmt(c.raw, 1)} kg`
+          }
+        }
+      },
+      scales: {
+        x: { beginAtZero: true, grid: { color: "#e2e8f0" } },
+        y: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+function calculatePower() {
+  const r = positive("solarDistance");
+  const area = positive("panelArea");
+  const eff = positive("efficiency") / 100;
+  const f = positive("degradation") / 100;
+  const load = positive("load", true);
+  const em = positive("emissivity");
+
+  const flux = S0 / (r * r);
+  const power = flux * area * eff * f;
+  const margin = power - load;
+  const alpha = 0.7;
+  const T = Math.pow((alpha * flux) / (4 * em * SIGMA), 0.25);
+
+  setMetric("solarFlux", flux, "W/m²", 1);
+  setMetric("generatedPower", power, "W", 1);
+  setMetric("powerMargin", margin, "W", 1);
+  setMetric("thermalTemp", T, "K", 1);
+  setMetric("thermalC", T - 273.15, "°C", 1);
+  setStatusBadge("powerStatus", margin >= 0);
+
+  updatePowerChart(power, load);
+  return { flux, power, margin, T };
+}
+
+function updatePowerChart(gen, load) {
+  const ctx = $("powerChart").getContext("2d");
+  const labels = [
+    wrapLabel(lang === "ar" ? "القدرة الكهربائية المنتجة" : "Generated Solar Power"),
+    wrapLabel(lang === "ar" ? "الحمل الكهربائي المستمر" : "Continuous Electrical Load")
+  ];
+  if (charts.power) charts.power.destroy();
+  charts.power = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        label: lang === "ar" ? "القدرة (W)" : "Power (W)",
+        data: [gen, load],
+        backgroundColor: [gen >= load ? "#0f766e" : "#f59e0b", "#475569"],
+        borderRadius: 8,
+        barThickness: 48
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: c => `${fmt(c.raw, 1)} W` } }
+      },
+      scales: {
+        y: { beginAtZero: true, grid: { color: "#e2e8f0" } },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+}
+
+function calculateComms() {
+  const d = positive("distance") * 1000;
+  const f = positive("frequency") * 1e9;
+  const pt = positive("txPower");
+  const gt = num("txGain");
+  const gr = num("rxGain");
+  const loss = positive("losses", true);
+  const tn = positive("noiseTemp");
+  const rate = positive("dataRate") * 1000;
+  const req = positive("requiredEb", true);
+
+  const fspl = 20 * Math.log10(4 * Math.PI * d * f / C);
+  const eirp = 10 * Math.log10(pt) + gt;
+  const cn0 = eirp - fspl + gr - loss - K_DB - 10 * Math.log10(tn);
+  const ebn0 = cn0 - 10 * Math.log10(rate);
+  const margin = ebn0 - req;
+  const lightTime = d / C / 60;
+
+  setMetric("lightTime", lightTime, "min", 2);
+  setMetric("fspl", fspl, "dB", 2);
+  setMetric("eirp", eirp, "dBW", 2);
+  setMetric("cn0", cn0, "dB-Hz", 2);
+  setMetric("ebn0", ebn0, "dB", 2);
+  setMetric("linkMargin", margin, "dB", 2);
+
+  const mEl = $("linkMargin");
+  mEl.className = "text-lg font-extrabold " + (margin >= 3 ? "text-emerald-700" : margin >= 0 ? "text-amber-600" : "text-rose-600");
+
+  const pct = Math.max(0, Math.min(100, ((margin + 10) / 25) * 100));
+  const bar = $("marginBar");
+  bar.style.width = pct + "%";
+  bar.className = "h-full transition-all duration-300 " + (margin >= 3 ? "bg-emerald-600" : margin >= 0 ? "bg-amber-500" : "bg-rose-600");
+  $("marginBadgeText").textContent = `${fmt(margin, 2)} dB (${margin >= 0 ? (lang === "ar" ? "وصلة مستقرة" : "Nominal") : (lang === "ar" ? "فقدان الإشارة" : "Link Lost")})`;
+
+  return { fspl, eirp, cn0, ebn0, margin, lightTime };
+}
+
+function calculateMassBudget() {
+  const mPayload = positive("mPayload", true);
+  const mStruct = positive("mStructure", true);
+  const mPower = positive("mPower", true);
+  const mAv = positive("mAvionics", true);
+  const mPropSys = positive("mPropSys", true);
+  const mProp = Number($("mPropLinked").value) || 0;
+
+  const totalDry = mPayload + mStruct + mPower + mAv + mPropSys;
+  const totalWet = totalDry + mProp;
+  const payloadFraction = totalDry > 0 ? mPayload / totalDry : 0;
+
+  setMetric("totalDryMass", totalDry, "kg", 1);
+  setMetric("totalWetMass", totalWet, "kg", 1);
+  setMetric("payloadFraction", payloadFraction * 100, "%", 1);
+  setStatusBadge("massStatus", totalWet <= 50000);
+
+  updateMassChart([mPayload, mStruct, mPower, mAv, mPropSys, mProp]);
+  return { totalDry, totalWet, payloadFraction };
+}
+
+function updateMassChart(values) {
+  const ctx = $("massChart").getContext("2d");
+  const labels = lang === "ar"
+    ? ["الحمولة العلمية", "الهيكل والحرارة", "نظام الطاقة", "التوجيه والحاسب", "الدفع الجاف", "الوقود"]
+    : ["Payload", "Structure", "Power", "Avionics", "Dry Propulsion", "Propellant"];
+  if (charts.mass) charts.mass.destroy();
+  charts.mass = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: labels.map(l => wrapLabel(l, 16)),
+      datasets: [{
+        data: values,
+        backgroundColor: ["#0f766e", "#64748b", "#f59e0b", "#3b82f6", "#8b5cf6", "#10b981"],
+        borderWidth: 2,
+        borderColor: "#ffffff"
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position: "right", labels: { boxWidth: 12, font: { size: 11 } } },
+        tooltip: { callbacks: { label: c => `${c.label}: ${fmt(c.raw, 1)} kg` } }
+      }
+    }
+  });
+}
+
+function drawOrbit() {
+  const canvas = $("orbitCanvas");
+  const ctx = canvas.getContext("2d");
+  const w = canvas.width, h = canvas.height, cx = w / 2, cy = h / 2;
+  ctx.clearRect(0, 0, w, h);
+
+  const target = $("target").value;
+
+  if (target === "moon") {
+    ctx.fillStyle = "#2563eb";
+    ctx.beginPath(); ctx.arc(cx - 120, cy, 18, 0, Math.PI * 2); ctx.fill();
+
+    ctx.strokeStyle = "#94a3b8"; ctx.lineWidth = 1.5; ctx.setLineDash([4, 4]);
+    ctx.beginPath(); ctx.arc(cx - 120, cy, 240, -0.4, 0.4); ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.strokeStyle = "#0f766e"; ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.ellipse(cx, cy, 120, 55, 0, Math.PI, Math.PI * 2);
+    ctx.stroke();
+
+    ctx.fillStyle = "#64748b";
+    ctx.beginPath(); ctx.arc(cx + 120, cy, 10, 0, Math.PI * 2); ctx.fill();
+
+    ctx.fillStyle = "#1e293b"; ctx.font = "bold 13px sans-serif"; ctx.textAlign = "center";
+    ctx.fillText("EARTH", cx - 120, cy + 36);
+    ctx.fillText("MOON", cx + 120, cy + 28);
+    ctx.fillStyle = "#0f766e";
+    ctx.fillText("TLI Transfer Trajectory", cx, cy - 68);
+  } else {
+    ctx.fillStyle = "#f59e0b";
+    ctx.beginPath(); ctx.arc(cx, cy, 16, 0, Math.PI * 2); ctx.fill();
+
+    let earthR = 85, targetR = 145;
+    if (target === "mars") targetR = 155;
+    if (target === "venus") targetR = 115;
+    if (target === "mercury") targetR = 60;
+    if (target === "jupiter") targetR = 220;
+
+    ctx.strokeStyle = "#cbd5e1"; ctx.lineWidth = 1.5;
+    [earthR, targetR].forEach(r => {
+      ctx.beginPath(); ctx.ellipse(cx, cy, r, r * 0.52, 0, 0, Math.PI * 2); ctx.stroke();
+    });
+
+    const isOuter = targetR > earthR;
+    const rx = (earthR + targetR) / 2;
+    const ry = rx * 0.52;
+    const offsetX = isOuter ? (earthR - targetR) / 2 : (targetR - earthR) / 2;
+
+    ctx.strokeStyle = "#0f766e"; ctx.lineWidth = 2.5; ctx.setLineDash([6, 4]);
+    ctx.beginPath();
+    if (isOuter) {
+      ctx.ellipse(cx + offsetX, cy, rx, ry, 0, Math.PI, Math.PI * 2);
+    } else {
+      ctx.ellipse(cx - offsetX, cy, rx, ry, 0, 0, Math.PI);
+    }
+    ctx.stroke(); ctx.setLineDash([]);
+
+    ctx.fillStyle = "#2563eb";
+    ctx.beginPath(); ctx.arc(cx + earthR, cy, 7, 0, Math.PI * 2); ctx.fill();
+
+    ctx.fillStyle = "#dc2626";
+    ctx.beginPath(); ctx.arc(cx - targetR, cy, 8, 0, Math.PI * 2); ctx.fill();
+
+    ctx.fillStyle = "#1e293b"; ctx.font = "bold 12px sans-serif"; ctx.textAlign = "center";
+    ctx.fillText("SUN", cx, cy + 30);
+    ctx.fillText("EARTH", cx + earthR, cy - 14);
+    ctx.fillText(target.toUpperCase(), cx - targetR, cy - 14);
+  }
+}
+
+function runTests() {
+  const tests = [];
+  const add = (name, pass, detail) => tests.push({ name, pass, detail });
+
+  try {
+    const h = calculateMission();
+    add(lang === "ar" ? "تقارب الميكانيكا المدارية" : "Orbital Mechanics Convergence", h.days > 0 && Number.isFinite(h.total), `Transfer = ${fmt(h.days, 1)} days, Δv = ${fmt(h.total, 2)} km/s`);
+
+    const prop = calculateProp();
+    add(lang === "ar" ? "معادلة تسيولكوفسكي للدفع" : "Tsiolkovsky Rocket Law", prop.availableDv > 0 && prop.finalMass >= 0, `Available Δv = ${fmt(prop.availableDv / 1000, 2)} km/s`);
+
+    const pow = calculatePower();
+    add(lang === "ar" ? "التدفق الشمسي والاتزان الحراري" : "Solar & Thermal Equilibrium", pow.flux > 0 && pow.T > 0, `Flux = ${fmt(pow.flux, 1)} W/m², T = ${fmt(pow.T, 1)} K`);
+
+    const comm = calculateComms();
+    add(lang === "ar" ? "ميزانية اتصالات الفضاء السحيق" : "DSN Link Budget Integrity", Number.isFinite(comm.fspl) && comm.lightTime > 0, `FSPL = ${fmt(comm.fspl, 1)} dB, Light Time = ${fmt(comm.lightTime, 1)} min`);
+
+    const mass = calculateMassBudget();
+    add(lang === "ar" ? "اتساق هيكل الكتلة الشامل" : "System Mass Consistency", mass.totalWet >= mass.totalDry && mass.totalDry > 0, `Wet Mass = ${fmt(mass.totalWet, 1)} kg`);
+  } catch (e) {
+    add("System Exception", false, e.message);
+  }
+
+  $("testResults").innerHTML = tests.map(t => `
+    <div class="p-3.5 rounded-xl bg-stone-50 border border-stone-200 flex items-center justify-between gap-3">
+      <div>
+        <div class="text-sm font-bold text-slate-800">${t.name}</div>
+        <div class="text-xs text-slate-500 mt-0.5" dir="ltr">${t.detail}</div>
+      </div>
+      <span class="px-2.5 py-1 rounded-md text-xs font-bold ${t.pass ? "bg-emerald-100 text-emerald-800" : "bg-rose-100 text-rose-800"}">
+        ${t.pass ? (lang === "ar" ? "اجتاز" : "PASS") : (lang === "ar" ? "فشل" : "FAIL")}
+      </span>
+    </div>
+  `).join("");
+
+  const allPass = tests.every(t => t.pass);
+  setStatusBadge("snapStatus", allPass);
+}
+
+function runAll() {
+  try {
+    calculateMission();
+    calculateProp();
+    calculatePower();
+    calculateComms();
+    calculateMassBudget();
+    runTests();
+  } catch (e) {
+    alert((lang === "ar" ? "تنبيه إدخال: " : "Input Error: ") + e.message);
+  }
+}
+
+document.querySelectorAll(".tab-btn").forEach(btn => {
+  btn.addEventListener("click", () => {
+    document.querySelectorAll(".tab-btn").forEach(b => {
+      b.className = "tab-btn px-4 py-2.5 rounded-xl text-sm font-semibold whitespace-nowrap bg-white text-slate-600 hover:bg-stone-100 border border-stone-200 transition";
+    });
+    btn.className = "tab-btn active px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap bg-teal-700 text-white shadow-sm transition";
+    document.querySelectorAll(".tab-panel").forEach(p => p.classList.toggle("hidden", p.id !== btn.dataset.tab));
+  });
+});
+
+$("langBtn").addEventListener("click", () => setLang(lang === "ar" ? "en" : "ar"));
+$("resetBtn").addEventListener("click", () => location.reload());
+$("calcMission").addEventListener("click", runAll);
+$("calcProp").addEventListener("click", runAll);
+$("calcPower").addEventListener("click", runAll);
+$("calcComms").addEventListener("click", runAll);
+$("calcMass").addEventListener("click", runAll);
+$("runTests").addEventListener("click", runTests);
+
+$("target").addEventListener("change", runAll);
+$("solarDistance").addEventListener("change", calculatePower);
+["orbitAlt", "payload", "arrival"].forEach(id => $(id).addEventListener("change", runAll));
+
+$("exportBtn").addEventListener("click", () => {
+  try {
+    const value = id => Number($(id).value);
+    const data = {
+      platform: "Phoenix-A Mission Design & Systems Simulator",
+      schemaVersion: 1,
+      timestamp: new Date().toISOString(),
+      modelLimitations: [
+        "Planetary Hohmann values are heliocentric ideal velocity differences; they are not a complete Earth-parking-orbit-to-arrival mission delta-v budget.",
+        "Lunar arrival delta-v is a fixed assumed value in this simplified model.",
+        "Mass feasibility uses a generic 50000 kg reference threshold, not a selected launch vehicle performance curve."
+      ],
+      mission: {
+        target: $("target").value,
+        orbitAlt_km: value("orbitAlt"),
+        payload_kg: value("payload"),
+        additionalManeuverMargin_km_s: value("arrival")
+      },
+      propulsion: {
+        dryMass_kg: value("dryMass"),
+        propellantMass_kg: value("propMass"),
+        specificImpulse_s: value("isp"),
+        requiredDeltaV_m_s: value("requiredDv"),
+        thrust_N: value("thrust")
+      },
+      powerThermal: {
+        solarDistance_AU: value("solarDistance"),
+        panelArea_m2: value("panelArea"),
+        cellEfficiency_percent: value("efficiency"),
+        performanceFactor_percent: value("degradation"),
+        continuousLoad_W: value("load"),
+        surfaceEmissivity: value("emissivity")
+      },
+      communications: {
+        distance_km: value("distance"),
+        frequency_GHz: value("frequency"),
+        transmitPower_W: value("txPower"),
+        spacecraftAntennaGain_dBi: value("txGain"),
+        groundAntennaGain_dBi: value("rxGain"),
+        additionalLosses_dB: value("losses"),
+        systemNoiseTemperature_K: value("noiseTemp"),
+        dataRate_kbps: value("dataRate"),
+        requiredEbN0_dB: value("requiredEb")
+      },
+      massBudget_kg: {
+        payload: value("mPayload"),
+        structureThermal: value("mStructure"),
+        powerSystem: value("mPower"),
+        avionicsGNC: value("mAvionics"),
+        dryPropulsionSystem: value("mPropSys"),
+        linkedPropellant: value("mPropLinked")
+      }
+    };
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: "application/json;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = "Phoenix-A_Mission_Config.json";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    window.setTimeout(() => URL.revokeObjectURL(url), 1000);
+  } catch (error) {
+    alert((lang === "ar" ? "تعذر تصدير الإعدادات: " : "Export failed: ") + error.message);
+  }
+});
+
+$("printBtn").addEventListener("click", () => window.print());
+
+window.addEventListener("DOMContentLoaded", runAll);
+</script>
+</body>
+</html>
